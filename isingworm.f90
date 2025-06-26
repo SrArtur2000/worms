@@ -150,7 +150,8 @@ subroutine movesnake(A,mu,lworm,snake,nn,lm2,qsi,beta,w)
 
 	w = tanh(beta)
 	dir = mod(mu,2) + (1+(-1)**mu)
-	mmu = (mu-1)*(mu-2)*(mu-3)/3 - (mu-1)*(mu-2)*(mu-4)/2 - (mu-2)*(mu-3)*(mu-4)/2 + (mu-1)*(mu-3)*(mu-4)*2
+	! Simplified calculation for opposite direction
+	mmu = mod(mu+1, 4) + 1
 	call random_number(r)
 	r(1)  = 2.0d0*r(1)
 	x = 1
@@ -163,7 +164,7 @@ subroutine movesnake(A,mu,lworm,snake,nn,lm2,qsi,beta,w)
 	  snake(x,dir) = nn(mu,snake(x,dir))
 !	  print*, "O ponto final é"
 !	  print*, mmu, snake(x,1), snake(x,2)
-	  A(mmu,snake(x,1),snake(x,2)) = A(mu,snakeaux(x,1),snakeaux(x,2))
+	  A(mmu,snake(x,1),snake(x,2)) = mod(A(mu,snakeaux(x,1),snakeaux(x,2))+1,2)
 	  lworm = lworm + dif
 	  qsi = qsi + dif
 	  lm2 = lm2 + 1
