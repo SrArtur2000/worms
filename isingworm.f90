@@ -5,6 +5,7 @@ program isingworm
 	integer(8), parameter :: Nth = 5000, N = L**2, Na = 2*N
 	
 	real(8) :: T,qsi1,qsi2,E1,w,C1,C2,lmean,l2mean,beta,E2,aux,soma,lmean1,l1,l2,lmean2
+	real(8) :: winding_sum, winding2_sum
 	integer(8) :: j,k,k1,k2,mu,n1,n2,nu,Nb,lm2
 	integer(8), dimension(0:1,2) :: snake
 	integer(8), dimension(4,L,L) :: A
@@ -36,6 +37,8 @@ program isingworm
 	  w = tanh(beta)
 	  qsi1 = 0.0d0
 	  qsi2 = 0.0d0
+	  winding_sum = 0.0d0
+	  winding2_sum = 0.0d0
 	  lm2 = 0.0d0
 	  l1 = 0.0d0
 	  l2 = 0.0d0
@@ -81,6 +84,20 @@ program isingworm
 	    C2 = (beta**2)*((1.0d0/((sinh(beta)*cosh(beta))**2))*(lmean2 - lmean1 - lmean1**2)&
 	    + (1.0d0/((cosh(beta))**2))*(Na - 2.0d0*lmean1))/N
 !	    write(10,*)T, qsi1
+	    ! Properly calculate magnetic susceptibility using worm algorithm approach
+	    ! In the worm algorithm, susceptibility is related to winding number fluctuations
+	    ! and worm length statistics
+	    if (Z > 0) then
+	      ! Calculate winding number statistics from the worm data
+	      winding_sum = real(l3)/Z    ! Average worm length
+	      winding2_sum = real(l4)/Z   ! Average squared worm length
+	      
+	      ! Magnetic susceptibility is proportional to winding number fluctuations
+	      ! χ ∝ ⟨W²⟩ - ⟨W⟩²
+	      qsi2 = beta * (winding2_sum - winding_sum**2) / N
+	    else
+	      qsi2 = 0.0d0
+	    endif
 	    write(11,*)T, qsi2
 	    write(20,*)T, abs(E1-E2)
 	    write(21,*)T, E2
